@@ -30,7 +30,7 @@ async function run() {
 			}
 			res.send(result);
 		})
-
+		
 		app.post('/policeRegister', async(req,res) => {
 			const doc = req.body;
 			const requesterEmail = doc.email;
@@ -44,6 +44,24 @@ async function run() {
 			} 
 			return res.send(false);
 			
+		})
+
+		app.put('/policeRegister', async(req, res) => {
+			const doc = req.body;
+			const requesterEmail = doc.email;
+			const filter = {email: requesterEmail};
+			const options = {upsert: true};
+			const updateDoc = {
+				$set: {
+					name: doc.name,
+					rangId: doc.rangId,
+					responsibility: doc.responsibility,
+					thana: doc.thana,
+					phone: doc.phone
+				}
+			}
+			const result = await policeCollections.updateOne(filter, updateDoc, options);
+			res.send(result);
 		})
 
 	}
