@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 
 const app = express();
@@ -20,6 +20,7 @@ async function run() {
 	try{
 		await client.connect();
 		const policeCollections = client.db('db_Indentificaiton').collection('police');
+		const thanaCollections = client.db('db_Indentificaiton').collection('thana');
 
 		app.get('/policeRegister/:email', async(req, res) => {
 			const email = req.params.email;
@@ -62,6 +63,33 @@ async function run() {
 			}
 			const result = await policeCollections.updateOne(filter, updateDoc, options);
 			res.send(result);
+		})
+
+		app.get('/thana', async(req,res) => {
+			const result = await thanaCollections.find().toArray();
+			res.send(result);
+		})
+
+		app.get('/thanaById/:id',async(req, res) => {
+			const id = req.params.id;
+			const query = {_id: ObjectId(id)};
+			const result = await thanaCollections.findOne(query);
+			res.send(result);
+		})
+
+		app.get('/policeThana/:thana_id/:responsibility', async(req, res) => {
+			const thana_id = req.params.thana_id;
+			const responsibility  = req.params.responsibility;
+			console.log(thana_id, responsibility);
+			const query = {_id: ObjectId(thana_id)};
+			const thana = await thanaCollections.findOne(query);
+			const thana_name = thana.thana_name;
+
+			const query2 = {thana: thana_name, responsibility:responsibility}
+			const police = await policeCollections.find(query2).toArray();
+			console.log(police);
+
+			res.send(police);
 		})
 
 	}
