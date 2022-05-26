@@ -99,6 +99,20 @@ async function run() {
 			const result = await policeCollections.findOne(query);
 			res.send(result);
 		})
+		
+		// Find Police by Rnage ID
+		app.get('/policeSearch/:id', async(req,res) => {
+			const id = req.params.id;
+			const query = {rangId: id};
+			const result = await policeCollections.findOne(query);
+			if(result){
+				return res.status(202).send(result);
+			}
+			res.status(404).send(
+				{data:true}
+			)
+		})
+
 
 	}
 	finally{
