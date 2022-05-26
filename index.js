@@ -58,7 +58,8 @@ async function run() {
 					rangId: doc.rangId,
 					responsibility: doc.responsibility,
 					thana: doc.thana,
-					phone: doc.phone
+					phone: doc.phone,
+					image: doc.image
 				}
 			}
 			const result = await policeCollections.updateOne(filter, updateDoc, options);
@@ -90,6 +91,13 @@ async function run() {
 			console.log(police);
 
 			res.send(police);
+		})
+		
+		app.get('/police/:id', async(req, res)=> {
+			const id = req.params.id;
+			const query = {rangId: id};
+			const result = await policeCollections.findOne(query);
+			res.send(result);
 		})
 
 	}
