@@ -21,7 +21,7 @@ async function run() {
 		await client.connect();
 		const policeCollections = client.db('db_Indentificaiton').collection('police');
 		const thanaCollections = client.db('db_Indentificaiton').collection('thana');
-
+		console.log('MongoDb connected');
 		app.get('/policeRegister/:email', async(req, res) => {
 			const email = req.params.email;
 			const query = {email: email};
@@ -35,15 +35,26 @@ async function run() {
 		app.post('/policeRegister', async(req,res) => {
 			const doc = req.body;
 			const requesterEmail = doc.email;
+			const rId = doc.rangId;
+			console.log('data',doc);
+			const query1 = {rangId: rId};
+			const identifyRangIdDup = await policeCollections.findOne(query1);
+			console.log(identifyRangIdDup);
 
-			const query = {email: requesterEmail};
-			const request = await policeCollections.findOne(query);
+			
+			const query2 = {email: requesterEmail};
+			const request = await policeCollections.findOne(query2);
 
 			if(!request){
-				const result = await policeCollections.insertOne(doc);
-				return res.send(result);
+				if(!identifyRangIdDup){
+					const result = await policeCollections.insertOne(doc);
+					return res.send(result);
+				} else{
+					return res.send({found:true})
+				}
+			
 			} 
-			return res.send(false);
+			res.send({AlreadyReg:true});
 			
 		})
 
